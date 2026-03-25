@@ -1,6 +1,8 @@
 import { createServer } from "node:http";
 import { fileURLToPath } from "url";
 import { hostname } from "node:os";
+import { realpathSync } from "node:fs";
+import { join } from "node:path";
 import { server as wisp, logging } from "@mercuryworkshop/wisp-js/server";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
@@ -10,6 +12,8 @@ import { libcurlPath } from "@mercuryworkshop/libcurl-transport";
 import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
 
 const publicPath = fileURLToPath(new URL("../public/", import.meta.url));
+const rootPath = fileURLToPath(new URL("../", import.meta.url));
+const epoxyPath = realpathSync(join(rootPath, "node_modules", "@mercuryworkshop", "epoxy-transport", "dist"));
 
 // Wisp Configuration: Refer to the documentation at https://www.npmjs.com/package/@mercuryworkshop/wisp-js
 
@@ -49,6 +53,12 @@ fastify.register(fastifyStatic, {
 fastify.register(fastifyStatic, {
 	root: libcurlPath,
 	prefix: "/libcurl/",
+	decorateReply: false,
+});
+
+fastify.register(fastifyStatic, {
+	root: epoxyPath,
+	prefix: "/epoxy/",
 	decorateReply: false,
 });
 
